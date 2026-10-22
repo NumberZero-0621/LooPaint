@@ -1,209 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ウェブ・シーケンサー // 音響ドローイングDAW</title>
+  <title>LooPaint</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
-  <style>
-    /* =========================================================================
-     * カラーテーマ定義（CSSカスタムプロパティ）
-     * ========================================================================= */
-    :root, [data-theme="dark"] {
-      --bg-main: #10131b;
-      --bg-panel: #171c26;
-      --bg-surface: #202634;
-      --border-color: #2b3447;
-      --text-main: #f1f5f9;
-      --text-muted: #8b98af;
-      --canvas-bg: #0c0f16;
-      --ruler-bg: #141822;
-      --playhead-color: #ffffff;
-    }
-
-    [data-theme="light"] {
-      --bg-main: #f3f6fa;
-      --bg-panel: #ffffff;
-      --bg-surface: #e5ebf3;
-      --border-color: #cbd5e1;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --canvas-bg: #f8fafc;
-      --ruler-bg: #edf2f8;
-      --playhead-color: #0284c7;
-    }
-
-    [data-theme="beepbox"] {
-      --bg-main: #000411;
-      --bg-panel: #0a1128;
-      --bg-surface: #1c2541;
-      --border-color: #2d3e64;
-      --text-main: #e8f1f5;
-      --text-muted: #7f95b5;
-      --canvas-bg: #04091a;
-      --ruler-bg: #0e1732;
-      --playhead-color: #00f0ff;
-    }
-
-    [data-theme="songmaker"] {
-      --bg-main: #f8faff;
-      --bg-panel: #ffffff;
-      --bg-surface: #eef2ff;
-      --border-color: #dbeafe;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --canvas-bg: #ffffff;
-      --ruler-bg: #f1f5f9;
-      --playhead-color: #ef4444;
-    }
-
-    [data-theme="cyberpunk"] {
-      --bg-main: #0c0517;
-      --bg-panel: #160a2b;
-      --bg-surface: #27104b;
-      --border-color: #491b8a;
-      --text-main: #f8f5ff;
-      --text-muted: #b091db;
-      --canvas-bg: #110521;
-      --ruler-bg: #1f0d3c;
-      --playhead-color: #00f0ff;
-    }
-
-    [data-theme="sepia"] {
-      --bg-main: #25201c;
-      --bg-panel: #332c27;
-      --bg-surface: #453c35;
-      --border-color: #5c5047;
-      --text-main: #f5f0ea;
-      --text-muted: #ad9e92;
-      --canvas-bg: #1c1815;
-      --ruler-bg: #2d2621;
-      --playhead-color: #f59e0b;
-    }
-
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      user-select: none;
-      -webkit-user-select: none;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-
-    .themed-panel {
-      background-color: var(--bg-panel);
-      border-color: var(--border-color);
-    }
-    .themed-surface {
-      background-color: var(--bg-surface);
-      border-color: var(--border-color);
-    }
-    .themed-border {
-      border-color: var(--border-color);
-    }
-    .themed-text-muted {
-      color: var(--text-muted);
-    }
-
-    /* フラットなスライダー */
-    input[type="range"].flat-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      background: var(--bg-surface);
-      height: 5px;
-      border-radius: 3px;
-      border: 1px solid var(--border-color);
-      outline: none;
-    }
-    input[type="range"].flat-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
-      background: #06b6d4;
-      cursor: pointer;
-      border: 2px solid #ffffff;
-      transition: transform 0.08s ease;
-    }
-    input[type="range"].flat-slider.orange-thumb::-webkit-slider-thumb {
-      background: #f97316;
-    }
-    input[type="range"].flat-slider.amber-thumb::-webkit-slider-thumb {
-      background: #f59e0b;
-    }
-    input[type="range"].flat-slider::-webkit-slider-thumb:hover {
-      transform: scale(1.25);
-    }
-
-    /* セレクトボックス */
-    select {
-      background-color: var(--bg-surface) !important;
-      color: var(--text-main) !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: 4px;
-      padding: 3px 6px;
-      outline: none;
-      font-size: 11px;
-    }
-    select:focus {
-      border-color: #06b6d4 !important;
-    }
-    select option {
-      background-color: var(--bg-panel) !important;
-      color: var(--text-main) !important;
-    }
-
-    /* ステップパッド */
-    .step-pad {
-      transition: background-color 0.05s ease, border-color 0.05s ease;
-      position: relative;
-    }
-    .step-pad:active {
-      transform: scale(0.95);
-    }
-
-    /* プレイヘッドのハイライト */
-    .playhead-active {
-      outline: 2px solid var(--playhead-color) !important;
-      outline-offset: -1px;
-      z-index: 10;
-    }
-
-    /* 16列グリッド */
-    .grid-cols-16 {
-      grid-template-columns: repeat(16, minmax(0, 1fr));
-    }
-
-    /* スクロールバー */
-    ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--bg-main);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
-    }
-
-    /* タイムライン・シークバー用ホバー */
-    .timeline-ruler:hover {
-      cursor: pointer;
-      filter: brightness(1.15);
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body class="min-h-screen flex flex-col justify-between p-2 sm:p-3 text-xs sm:text-sm" data-theme="dark">
 
   <!-- メインDAWコンテナ -->
@@ -218,22 +31,26 @@
           <div class="w-2.5 h-8 rounded-sm bg-gradient-to-b from-cyan-400 to-blue-600"></div>
           <div>
             <div class="flex items-center space-x-2">
-              <h1 class="font-bold text-sm sm:text-base tracking-wide">ウェブ・シーケンサー</h1>
-              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded themed-surface border themed-border text-cyan-500 font-medium">8オクターブ・音響ドローイングDAW</span>
+              <h1 class="font-bold text-sm sm:text-base tracking-wide">LooPaint</h1>
+              <span
+                class="text-[10px] font-mono px-1.5 py-0.5 rounded themed-surface border themed-border text-cyan-500 font-medium">ドローイングシーケンサー</span>
             </div>
-            <p class="text-[11px] themed-text-muted hidden sm:block">絵を描くようにメロディを作曲 ＆ アナログ連続ピッチ変化 ＆ 多彩な楽器音色</p>
+            <p class="text-[11px] themed-text-muted hidden sm:block">絵を描くようにメロディを作曲</p>
           </div>
         </div>
 
         <!-- トランスポート操作（最初から再生・再生・停止・小節位置・ループ切替） -->
         <div class="flex items-center space-x-1.5 themed-surface p-1 rounded-md border themed-border">
           <!-- 最初に戻るボタン (シーク先頭) -->
-          <button id="rewindBtn" class="px-2 py-1 rounded text-xs hover:bg-slate-500/20 themed-text-muted hover:text-white transition" title="曲の最初 (0小節目) に戻る">
+          <button id="rewindBtn"
+            class="px-2 py-1 rounded text-xs hover:bg-slate-500/20 themed-text-muted hover:text-white transition"
+            title="曲の最初 (0小節目) に戻る">
             ⏮
           </button>
 
           <!-- 再生 / 一時停止 -->
-          <button id="playBtn" class="flex items-center space-x-1 px-3 py-1.5 rounded font-semibold text-xs bg-slate-700/30 hover:bg-slate-700/60 border themed-border transition">
+          <button id="playBtn"
+            class="flex items-center space-x-1 px-3 py-1.5 rounded font-semibold text-xs bg-slate-700/30 hover:bg-slate-700/60 border themed-border transition">
             <span id="playIcon" class="w-2 h-2 inline-block bg-emerald-500 rounded-full"></span>
             <span id="playText">再生</span>
           </button>
@@ -244,8 +61,10 @@
           </button>
 
           <!-- ループ再生 ON/OFF トグル -->
-          <button id="loopToggleBtn" class="px-2 py-1 rounded text-[11px] font-bold border themed-border bg-cyan-500/20 text-cyan-400 transition" title="ループ再生 ON / OFF">
-            🔁 ループ中
+          <button id="loopToggleBtn"
+            class="px-2 py-1 rounded text-[11px] font-bold border themed-border bg-cyan-500/20 text-cyan-400 transition"
+            title="ループ再生 ON / OFF">
+            ループ中
           </button>
 
           <!-- 小節・ステップ表示 -->
@@ -276,7 +95,8 @@
               <span class="themed-text-muted">BPM</span>
               <span id="bpmVal" class="text-orange-500 font-bold">120</span>
             </div>
-            <input id="bpmSlider" type="range" min="40" max="220" value="120" class="flat-slider orange-thumb" title="曲のテンポ (BPM)" />
+            <input id="bpmSlider" type="range" min="40" max="220" value="120" class="flat-slider orange-thumb"
+              title="曲のテンポ (BPM)" />
           </div>
 
           <!-- マスター音量 -->
@@ -295,29 +115,33 @@
           <div class="flex items-center space-x-1">
             <span class="text-[10px] themed-text-muted">🎨 テーマ:</span>
             <select id="themeSelect" title="画面全体のカラーテーマを切り替え">
-              <option value="dark" selected>🌙 ダークスレート</option>
-              <option value="light">☀️ クリーンライト</option>
-              <option value="beepbox">🎹 BeepBox レトロ</option>
-              <option value="songmaker">🎨 Song Maker パステル</option>
-              <option value="cyberpunk">👾 サイバーパンク</option>
-              <option value="sepia">☕ カフェ・セピア</option>
+              <option value="dark" selected>ダーク</option>
+              <option value="light">ライト</option>
+              <option value="beepbox">レトロ</option>
+              <option value="songmaker">パステル</option>
+              <option value="cyberpunk">サイバー</option>
+              <option value="sepia">セピア</option>
             </select>
           </div>
 
           <!-- ミニビジュアライザー -->
-          <div class="relative themed-surface border themed-border rounded overflow-hidden w-24 h-8 cursor-pointer hidden md:block" id="visualizerContainer" title="クリックで表示切替">
+          <div
+            class="relative themed-surface border themed-border rounded overflow-hidden w-24 h-8 cursor-pointer hidden md:block"
+            id="visualizerContainer" title="クリックで表示切替">
             <canvas id="visualizerCanvas" class="w-full h-full block"></canvas>
           </div>
 
           <!-- プリセット & 描画クリア -->
           <select id="presetSelect" class="text-xs rounded px-2 py-1">
-            <option value="starry">プリセット 1: 星空のドローイング</option>
-            <option value="piano_melody">プリセット 2: ピアノ＆ギターアンサンブル</option>
-            <option value="slide_acid">プリセット 3: アシッド・スライド</option>
-            <option value="empty">空のキャンバス (新規作成)</option>
+            <option value="empty">空のキャンバス</option>
+            <option value="starry">プリセット 1</option>
+            <option value="piano_melody">プリセット 2</option>
+            <option value="slide_acid">プリセット 3</option>
           </select>
 
-          <button id="clearBtn" class="px-2 py-1 rounded text-xs bg-rose-500/20 hover:bg-rose-500/40 text-rose-500 border border-rose-500/40 transition" title="描画メロディを全消去">
+          <button id="clearBtn"
+            class="px-2 py-1 rounded text-xs bg-rose-500/20 hover:bg-rose-500/40 text-rose-500 border border-rose-500/40 transition"
+            title="描画メロディを全消去">
             全消去
           </button>
         </div>
@@ -333,47 +157,71 @@
 
         <!-- 描画ツール群 -->
         <div class="flex items-center space-x-1 themed-surface p-1 rounded border themed-border">
-          <button id="toolPen" class="px-2.5 py-1 rounded text-xs font-semibold border border-cyan-500 transition flex items-center space-x-1" title="自由ペン (フリーハンドで自由に絵を描く)">
-            <span>✏️ 自由ペン</span>
+          <button id="toolPen"
+            class="px-2.5 py-1 rounded text-xs font-semibold border border-cyan-500 transition flex items-center space-x-1"
+            title="自由ペン (フリーハンドで自由に絵を描く)">
+            <span>ペン</span>
           </button>
-          <button id="toolSlide" class="px-2.5 py-1 rounded text-xs font-semibold border border-transparent themed-text-muted hover:text-white transition flex items-center space-x-1" title="スライド直線 (Beepbox風のアナログ音階スライド)">
-            <span>↗️ スライド</span>
+          <button id="toolSlide"
+            class="px-2.5 py-1 rounded text-xs font-semibold border border-transparent themed-text-muted hover:text-white transition flex items-center space-x-1"
+            title="スライド直線 (Beepbox風のアナログ音階スライド)">
+            <span>直線</span>
           </button>
-          <button id="toolEraser" class="px-2.5 py-1 rounded text-xs font-semibold border border-transparent themed-text-muted hover:text-white transition flex items-center space-x-1" title="消しゴム (なぞった線を消去)">
-            <span>🧹 消しゴム</span>
+          <button id="toolEraser"
+            class="px-2.5 py-1 rounded text-xs font-semibold border border-transparent themed-text-muted hover:text-white transition flex items-center space-x-1"
+            title="消しゴム (なぞった線を消去)">
+            <span>消しゴム</span>
           </button>
-          <button id="undoBtn" class="px-2 py-1 rounded text-xs themed-text-muted hover:text-white transition" title="1つ前の描画を取り消す (Ctrl+Z)">
-            <span>↩️ 戻す</span>
+          <button id="undoBtn" class="px-2 py-1 rounded text-xs themed-text-muted hover:text-white transition"
+            title="1つ前の描画を取り消す (Ctrl+Z)">
+            <span>元に戻す</span>
           </button>
         </div>
 
         <!-- 楽器音色パレット (ピアノ・ギター・バイオリン・管楽器・シンセなど10種類) -->
-        <div class="flex items-center space-x-1 themed-surface px-2 py-1 rounded border themed-border overflow-x-auto max-w-full">
+        <div
+          class="flex items-center space-x-1 themed-surface px-2 py-1 rounded border themed-border overflow-x-auto max-w-full">
           <span class="text-[10px] themed-text-muted mr-0.5 font-bold whitespace-nowrap">音色:</span>
           <!-- 楽器ボタン群 -->
-          <button data-inst="piano" data-color="#3b82f6" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border-2 border-white transition flex items-center space-x-1" style="background-color: #3b82f6; color: white;" title="アコースティック・ピアノ (打弦倍音)">
-            <span>🎹 ピアノ</span>
+          <button data-inst="piano" data-color="#3b82f6"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border-2 border-white transition flex items-center space-x-1"
+            style="background-color: #3b82f6; color: white;" title="アコースティック・ピアノ (打弦倍音)">
+            <span>ピアノ</span>
           </button>
-          <button data-inst="guitar" data-color="#f59e0b" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #f59e0b; color: white;" title="アコースティック・ギター (弦振動物理モデル)">
-            <span>🎸 ギター</span>
+          <button data-inst="guitar" data-color="#f59e0b"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #f59e0b; color: white;" title="アコースティック・ギター (弦振動物理モデル)">
+            <span>ギター</span>
           </button>
-          <button data-inst="strings" data-color="#8b5cf6" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #8b5cf6; color: white;" title="ストリングス / バイオリン (アンサンブル)">
-            <span>🎻 弦楽器</span>
+          <button data-inst="strings" data-color="#8b5cf6"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #8b5cf6; color: white;" title="ストリングス / バイオリン (アンサンブル)">
+            <span>弦楽器</span>
           </button>
-          <button data-inst="brass" data-color="#eab308" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #eab308; color: #1e293b;" title="ブラス / サックス (金管楽器)">
-            <span>🎷 ブラス</span>
+          <button data-inst="brass" data-color="#eab308"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #eab308; color: #1e293b;" title="ブラス / サックス (金管楽器)">
+            <span>ブラス</span>
           </button>
-          <button data-inst="marimba" data-color="#10b981" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #10b981; color: white;" title="マリンバ / 木琴 (ウッドパーカッション)">
-            <span>🔔 マリンバ</span>
+          <button data-inst="marimba" data-color="#10b981"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #10b981; color: white;" title="マリンバ / 木琴 (ウッドパーカッション)">
+            <span>マリンバ</span>
           </button>
-          <button data-inst="bass" data-color="#ef4444" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #ef4444; color: white;" title="エレキベース (太い重低音スラップ)">
-            <span>⚡ ベース</span>
+          <button data-inst="bass" data-color="#ef4444"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #ef4444; color: white;" title="エレキベース (太い重低音スラップ)">
+            <span>ベース</span>
           </button>
-          <button data-inst="cosmic" data-color="#06b6d4" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #06b6d4; color: white;" title="コズミック・シンセ (ディレイ＆エコー)">
-            <span>🚀 宇宙リード</span>
+          <button data-inst="cosmic" data-color="#06b6d4"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #06b6d4; color: white;" title="コズミック・シンセ (ディレイ＆エコー)">
+            <span>宇宙リード</span>
           </button>
-          <button data-inst="chiptune" data-color="#f97316" class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1" style="background-color: #f97316; color: white;" title="8bit 矩形波 (ファミコン風)">
-            <span>👾 8bit</span>
+          <button data-inst="chiptune" data-color="#f97316"
+            class="inst-btn px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent transition flex items-center space-x-1"
+            style="background-color: #f97316; color: white;" title="8bit 矩形波 (ファミコン風)">
+            <span>8bit</span>
           </button>
         </div>
 
@@ -396,7 +244,9 @@
           </div>
 
           <!-- 全体フィットボタン -->
-          <button id="zoomFitBtn" class="px-1.5 py-0.5 rounded text-[10px] border themed-border hover:bg-slate-500/20 transition" title="画面サイズに全体フィット">
+          <button id="zoomFitBtn"
+            class="px-1.5 py-0.5 rounded text-[10px] border themed-border hover:bg-slate-500/20 transition"
+            title="画面サイズに全体フィット">
             フィット
           </button>
         </div>
@@ -428,24 +278,30 @@
       </div>
 
       <!-- タイムライン・シークルーラー (クリックで途中から即座に再生可能！) -->
-      <div class="relative w-full h-6 border themed-border rounded-t overflow-hidden select-none timeline-ruler" id="timelineRulerContainer" title="クリックして途中から再生（再生位置を自由にジャンプ）" style="background-color: var(--ruler-bg);">
+      <div class="relative w-full h-6 border themed-border rounded-t overflow-hidden select-none timeline-ruler"
+        id="timelineRulerContainer" title="クリックして途中から再生（再生位置を自由にジャンプ）" style="background-color: var(--ruler-bg);">
         <canvas id="rulerCanvas" class="w-full h-full block"></canvas>
         <!-- シーク位置インジケーター -->
-        <div id="rulerSeekMarker" class="absolute top-0 bottom-0 w-1 bg-amber-400 pointer-events-none opacity-90 shadow-sm" style="left: 0%;"></div>
+        <div id="rulerSeekMarker"
+          class="absolute top-0 bottom-0 w-1 bg-amber-400 pointer-events-none opacity-90 shadow-sm" style="left: 0%;">
+        </div>
       </div>
 
       <!-- スクロール可能なピアノロールキャンバス領域 -->
-      <div id="canvasScrollWrapper" class="relative w-full border themed-border rounded-b overflow-auto" style="height: 380px; background-color: var(--canvas-bg);">
+      <div id="canvasScrollWrapper" class="relative w-full border themed-border rounded-b overflow-auto"
+        style="height: 380px; background-color: var(--canvas-bg);">
         <!-- 内部サイズがズーム倍率で拡張されるコンテナ -->
         <div id="canvasVirtualContainer" class="relative" style="width: 100%; height: 100%;">
           <canvas id="drawingCanvas" class="w-full h-full block cursor-crosshair"></canvas>
 
           <!-- 再生ヘッド縦バー (オーバーレイ) -->
-          <div id="canvasPlayhead" class="absolute top-0 bottom-0 w-0.5 pointer-events-none opacity-90 z-20" style="left: 0%; background-color: var(--playhead-color);"></div>
+          <div id="canvasPlayhead" class="absolute top-0 bottom-0 w-0.5 pointer-events-none opacity-90 z-20"
+            style="left: 0%; background-color: var(--playhead-color);"></div>
         </div>
 
         <!-- マウスカーソル音程・時間情報表示（フロート） -->
-        <div id="cursorInfo" class="absolute top-2 left-3 pointer-events-none themed-panel border themed-border rounded px-2 py-1 text-[10px] font-mono themed-text-muted flex items-center space-x-2 z-30 shadow">
+        <div id="cursorInfo"
+          class="absolute top-2 left-3 pointer-events-none themed-panel border themed-border rounded px-2 py-1 text-[10px] font-mono themed-text-muted flex items-center space-x-2 z-30 shadow">
           <span>音程: <strong id="cursorNoteText" class="text-white">--</strong></span>
           <span>周波数: <strong id="cursorFreqText" class="text-cyan-400">-- Hz</strong></span>
           <span>位置: <strong id="cursorTimeText" class="text-amber-400">--</strong></span>
@@ -461,7 +317,8 @@
         </div>
         <div class="flex items-center space-x-2">
           <span>メロディ音量:</span>
-          <input id="synthCanvasVol" type="range" min="0" max="100" value="85" class="flat-slider w-20" title="描画シンセ音量" />
+          <input id="synthCanvasVol" type="range" min="0" max="100" value="85" class="flat-slider w-20"
+            title="描画シンセ音量" />
         </div>
       </div>
 
@@ -494,1675 +351,10 @@
       </div>
     </div>
 
-    <!-- 4. 操作案内フッター -->
-    <footer class="flex flex-wrap items-center justify-between text-xs themed-text-muted px-1 gap-2 border-t themed-border pt-1">
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <span><strong class="text-white">[Space]</strong> 再生 / 停止</span>
-        <span><strong class="text-white">[タイムラインクリック]</strong> 途中から再生（シーク）</span>
-        <span><strong class="text-white">[キャンバスドラッグ]</strong> 絵を描く / スライド線を引く</span>
-        <span><strong class="text-white">[Ctrl + Z]</strong> 描画を取り消す</span>
-      </div>
-      <div>
-        <span>Web Audio API リアルタイム音響合成 // 8オクターブ無段階ピッチベンド</span>
-      </div>
-    </footer>
-
   </div>
 
-  <!-- アプリケーション JavaScript -->
-  <script>
-    /*************************************************************************
-     * 1. 状態管理 & 音楽データ構成
-     *************************************************************************/
-    const STEPS_PER_BAR = 16;
-
-    // 楽器音色パレット定義（10種類のアコースティック＆エレクトリック楽器）
-    const INSTRUMENTS = {
-      piano: {
-        name: 'ピアノ',
-        color: '#3b82f6',
-        category: 'acoustic',
-        type: 'piano'
-      },
-      guitar: {
-        name: 'ギター',
-        color: '#f59e0b',
-        category: 'acoustic',
-        type: 'guitar'
-      },
-      strings: {
-        name: '弦楽器',
-        color: '#8b5cf6',
-        category: 'acoustic',
-        type: 'strings'
-      },
-      brass: {
-        name: 'ブラス',
-        color: '#eab308',
-        category: 'acoustic',
-        type: 'brass'
-      },
-      marimba: {
-        name: 'マリンバ',
-        color: '#10b981',
-        category: 'acoustic',
-        type: 'marimba'
-      },
-      bass: {
-        name: 'ベース',
-        color: '#ef4444',
-        category: 'electric',
-        type: 'bass'
-      },
-      cosmic: {
-        name: '宇宙リード',
-        color: '#06b6d4',
-        category: 'synth',
-        type: 'cosmic'
-      },
-      chiptune: {
-        name: '8bit',
-        color: '#f97316',
-        category: 'synth',
-        type: 'chiptune'
-      }
-    };
-
-    // ドラムトラック
-    const DRUM_TRACKS = [
-      { id: 'kick',  name: 'バスドラム', short: 'キック', color: '#ff5722', volume: 0.95, tune: 50, muted: false },
-      { id: 'snare', name: 'スネア',     short: 'スネア', color: '#f59e0b', volume: 0.85, tune: 50, muted: false },
-      { id: 'clap',  name: '手拍子',     short: '手拍子', color: '#f43f5e', volume: 0.78, tune: 50, muted: false },
-      { id: 'ch',    name: 'C.ハット',   short: 'C.ハット', color: '#14b8a6', volume: 0.70, tune: 50, muted: false },
-      { id: 'oh',    name: 'O.ハット',   short: 'O.ハット', color: '#0ea5e9', volume: 0.65, tune: 50, muted: false }
-    ];
-
-    let drumPattern = Array.from({ length: DRUM_TRACKS.length }, () => Array(STEPS_PER_BAR).fill(0));
-    let strokes = [];
-    let undoStack = [];
-
-    // アプリケーション全体状態
-    const state = {
-      isPlaying: false,
-      isLoop: true, // ループ再生ON/OFF
-      bpm: 120,
-      totalBars: 2, // 全小節数 (1, 2, 4, 8, 16, 32)
-      playbackRatio: 0.0, // 0.0 〜 1.0 (曲全体の進行比率)
-      seekRatio: 0.0, // シーク開始位置 (0.0 〜 1.0)
-      masterVolume: 0.85,
-      canvasVolume: 0.85,
-      currentStep: 0,
-      // 描画設定
-      activeTool: 'pen', // 'pen' | 'slide' | 'eraser'
-      activeInstrument: 'piano',
-      gridSnap: 'free',
-      scaleSnap: 'continuous',
-      theme: 'dark',
-      // ズーム倍率
-      zoomX: 1.0, // 0.5 〜 3.0
-      zoomY: 1.0  // 0.6 〜 2.5
-    };
-
-    // 8オクターブMIDI範囲 (C1=24 〜 C8=108 / 84半音)
-    const MIN_MIDI = 24;
-    const MAX_MIDI = 108;
-
-    function midiToFreq(midi) {
-      return 440 * Math.pow(2, (midi - 69) / 12);
-    }
-    function freqToMidi(freq) {
-      return 69 + 12 * Math.log2(freq / 440);
-    }
-
-    const NOTE_NAMES = ['ド', 'ド#', 'レ', 'レ#', 'ミ', 'ファ', 'ファ#', 'ソ', 'ソ#', 'ラ', 'ラ#', 'シ'];
-
-    function midiToNoteString(midi) {
-      const rounded = Math.round(midi);
-      const noteIdx = ((rounded % 12) + 12) % 12;
-      const octave = Math.floor(rounded / 12) - 1;
-      return `${NOTE_NAMES[noteIdx]}${octave} (${rounded})`;
-    }
-
-    /*************************************************************************
-     * 2. WEB AUDIO API オーディオエンジン & リアル楽器合成
-     *************************************************************************/
-    let audioCtx = null;
-    let masterGain = null;
-    let canvasGain = null;
-    let analyser = null;
-    let delayNode = null;
-    let delayFeedback = null;
-    let delayWetGain = null;
-    let noiseBuffer = null;
-
-    // 能動的ボイスマップ
-    const activeVoices = new Map();
-
-    function initAudioEngine() {
-      if (audioCtx) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        return;
-      }
-
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContextClass();
-
-      const compressor = audioCtx.createDynamicsCompressor();
-      compressor.threshold.setValueAtTime(-12, audioCtx.currentTime);
-      compressor.knee.setValueAtTime(12, audioCtx.currentTime);
-      compressor.ratio.setValueAtTime(4, audioCtx.currentTime);
-      compressor.attack.setValueAtTime(0.003, audioCtx.currentTime);
-      compressor.release.setValueAtTime(0.15, audioCtx.currentTime);
-
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = state.masterVolume;
-
-      canvasGain = audioCtx.createGain();
-      canvasGain.gain.value = state.canvasVolume;
-      canvasGain.connect(compressor);
-
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-
-      // ディレイ
-      delayNode = audioCtx.createDelay(2.0);
-      delayNode.delayTime.value = (60 / state.bpm) * 0.75;
-      delayFeedback = audioCtx.createGain();
-      delayFeedback.gain.value = 0.36;
-
-      const delayFilter = audioCtx.createBiquadFilter();
-      delayFilter.type = 'lowpass';
-      delayFilter.frequency.value = 2800;
-
-      delayWetGain = audioCtx.createGain();
-      delayWetGain.gain.value = 0.35;
-
-      delayNode.connect(delayFilter);
-      delayFilter.connect(delayFeedback);
-      delayFeedback.connect(delayNode);
-      delayFilter.connect(delayWetGain);
-      delayWetGain.connect(compressor);
-
-      compressor.connect(masterGain);
-      masterGain.connect(analyser);
-      analyser.connect(audioCtx.destination);
-
-      audioCtx.mainBus = compressor;
-      audioCtx.canvasBus = canvasGain;
-      audioCtx.delaySend = delayNode;
-
-      // ホワイトノイズ生成
-      const bufferSize = audioCtx.sampleRate * 2;
-      noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const out = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        out[i] = Math.random() * 2 - 1;
-      }
-    }
-
-    // 楽器ごとのリアルタイム発音＆ピッチベンド追従
-    function updateStrokeVoice(stroke, freq, time) {
-      if (!audioCtx) initAudioEngine();
-      if (!freq || freq <= 0) return;
-
-      const id = stroke.id;
-      let voice = activeVoices.get(id);
-      const instType = stroke.instrumentKey || 'piano';
-
-      if (!voice) {
-        voice = createInstrumentVoice(instType, freq, time, stroke);
-        if (voice) activeVoices.set(id, voice);
-      } else {
-        // ピッチベンド（アナログ周波数連続更新）
-        voice.updatePitch(freq, time);
-      }
-    }
-
-    // 多彩な楽器ボイスの生成ファクトリ
-    function createInstrumentVoice(type, freq, time, stroke) {
-      const v = { nodes: [], stroke };
-
-      switch (type) {
-        case 'piano': {
-          // 🎹 アコースティック・ピアノ合成 (基本波 + 2倍音 + 3倍音 + 打弦ハンマー)
-          const osc1 = audioCtx.createOscillator();
-          const osc2 = audioCtx.createOscillator();
-          const osc3 = audioCtx.createOscillator();
-          osc1.type = 'sine';
-          osc2.type = 'triangle';
-          osc3.type = 'sine';
-
-          osc1.frequency.setValueAtTime(freq, time);
-          osc2.frequency.setValueAtTime(freq * 2, time);
-          osc3.frequency.setValueAtTime(freq * 3, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(Math.min(9000, freq * 4), time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.28, time + 0.005);
-
-          osc1.connect(filter);
-          osc2.connect(filter);
-          osc3.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-
-          osc1.start(time);
-          osc2.start(time);
-          osc3.start(time);
-
-          v.nodes = [osc1, osc2, osc3, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc1.frequency.setTargetAtTime(f, t, 0.012);
-            osc2.frequency.setTargetAtTime(f * 2, t, 0.012);
-            osc3.frequency.setTargetAtTime(f * 3, t, 0.012);
-            filter.frequency.setTargetAtTime(Math.min(9000, f * 4), t, 0.012);
-          };
-          break;
-        }
-
-        case 'guitar': {
-          // 🎸 アコースティックギター (弦振動モデル合成)
-          const osc = audioCtx.createOscillator();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(freq, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(Math.min(8000, freq * 3.5), time);
-          filter.Q.setValueAtTime(3.0, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.24, time + 0.008);
-
-          osc.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-          gain.connect(audioCtx.delaySend);
-
-          osc.start(time);
-
-          v.nodes = [osc, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc.frequency.setTargetAtTime(f, t, 0.012);
-            filter.frequency.setTargetAtTime(Math.min(8000, f * 3.5), t, 0.012);
-          };
-          break;
-        }
-
-        case 'strings': {
-          // 🎻 ストリングスアンサンブル (デチューン重鋸波 + ビブラート)
-          const oscA = audioCtx.createOscillator();
-          const oscB = audioCtx.createOscillator();
-          oscA.type = 'sawtooth';
-          oscB.type = 'sawtooth';
-          oscA.frequency.setValueAtTime(freq * 1.004, time);
-          oscB.frequency.setValueAtTime(freq * 0.996, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(4500, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.22, time + 0.04); // 柔らかいアタック
-
-          oscA.connect(filter);
-          oscB.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-          gain.connect(audioCtx.delaySend);
-
-          oscA.start(time);
-          oscB.start(time);
-
-          v.nodes = [oscA, oscB, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            oscA.frequency.setTargetAtTime(f * 1.004, t, 0.015);
-            oscB.frequency.setTargetAtTime(f * 0.996, t, 0.015);
-          };
-          break;
-        }
-
-        case 'brass': {
-          // 🎷 ブラス / サックス (倍音開閉フィルター)
-          const osc = audioCtx.createOscillator();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(freq, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(Math.min(7000, freq * 2.8), time);
-          filter.Q.setValueAtTime(4.0, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.25, time + 0.015);
-
-          osc.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-
-          osc.start(time);
-
-          v.nodes = [osc, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc.frequency.setTargetAtTime(f, t, 0.012);
-            filter.frequency.setTargetAtTime(Math.min(7000, f * 2.8), t, 0.012);
-          };
-          break;
-        }
-
-        case 'marimba': {
-          // 🔔 マリンバ / 木琴 (乾いた木管パーカッション)
-          const osc1 = audioCtx.createOscillator();
-          const osc2 = audioCtx.createOscillator();
-          osc1.type = 'sine';
-          osc2.type = 'sine';
-          osc1.frequency.setValueAtTime(freq, time);
-          osc2.frequency.setValueAtTime(freq * 3.9, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'bandpass';
-          filter.frequency.setValueAtTime(freq * 1.5, time);
-          filter.Q.setValueAtTime(1.5, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.28, time + 0.004);
-
-          osc1.connect(filter);
-          osc2.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-
-          osc1.start(time);
-          osc2.start(time);
-
-          v.nodes = [osc1, osc2, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc1.frequency.setTargetAtTime(f, t, 0.01);
-            osc2.frequency.setTargetAtTime(f * 3.9, t, 0.01);
-            filter.frequency.setTargetAtTime(f * 1.5, t, 0.01);
-          };
-          break;
-        }
-
-        case 'bass': {
-          // ⚡ エレキベース (太い三角波＋矩形波スラップ)
-          const osc = audioCtx.createOscillator();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(1800, time);
-          filter.Q.setValueAtTime(3.5, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.32, time + 0.006);
-
-          osc.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-
-          osc.start(time);
-
-          v.nodes = [osc, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc.frequency.setTargetAtTime(f, t, 0.012);
-          };
-          break;
-        }
-
-        case 'cosmic': {
-          // 🚀 宇宙リードシンセ (ディレイ＆レゾナンス)
-          const osc = audioCtx.createOscillator();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, time);
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(3600, time);
-          filter.Q.setValueAtTime(4.0, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.24, time + 0.02);
-
-          osc.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-          gain.connect(audioCtx.delaySend);
-
-          osc.start(time);
-
-          v.nodes = [osc, filter, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc.frequency.setTargetAtTime(f, t, 0.012);
-          };
-          break;
-        }
-
-        default: {
-          // 👾 8bit 矩形波
-          const osc = audioCtx.createOscillator();
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(freq, time);
-
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(0.20, time + 0.005);
-
-          osc.connect(gain);
-          gain.connect(audioCtx.canvasBus);
-
-          osc.start(time);
-
-          v.nodes = [osc, gain];
-          v.gainNode = gain;
-          v.updatePitch = (f, t) => {
-            osc.frequency.setTargetAtTime(f, t, 0.012);
-          };
-          break;
-        }
-      }
-
-      return v;
-    }
-
-    function stopStrokeVoice(id, time) {
-      const v = activeVoices.get(id);
-      if (!v) return;
-
-      if (v.gainNode) {
-        v.gainNode.gain.setValueAtTime(v.gainNode.gain.value, time);
-        v.gainNode.gain.exponentialRampToValueAtTime(0.0001, time + 0.06);
-      }
-
-      setTimeout(() => {
-        v.nodes.forEach(n => {
-          try { if (n.stop) n.stop(); } catch(e) {}
-          try { n.disconnect(); } catch(e) {}
-        });
-        activeVoices.delete(id);
-      }, 80);
-    }
-
-    function stopAllStrokeVoices() {
-      if (!audioCtx) return;
-      activeVoices.forEach((v, id) => {
-        if (v.gainNode) {
-          v.gainNode.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.02);
-        }
-        v.nodes.forEach(n => {
-          try { if (n.stop) n.stop(audioCtx.currentTime + 0.03); } catch(e) {}
-        });
-      });
-      activeVoices.clear();
-    }
-
-    // 単音プレビュー
-    function previewPitch(freq, instrumentKey = state.activeInstrument) {
-      initAudioEngine();
-      const v = createInstrumentVoice(instrumentKey, freq, audioCtx.currentTime, { id: 'preview' });
-      setTimeout(() => {
-        if (v && v.gainNode) {
-          v.gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
-          setTimeout(() => {
-            v.nodes.forEach(n => {
-              try { if (n.stop) n.stop(); } catch(e) {}
-              try { n.disconnect(); } catch(e) {}
-            });
-          }, 350);
-        }
-      }, 250);
-    }
-
-    /*************************************************************************
-     * 3. ドラム音声合成
-     *************************************************************************/
-    function triggerDrumVoice(trackIdx, time, velocity = 1.0) {
-      if (!audioCtx) initAudioEngine();
-      const track = DRUM_TRACKS[trackIdx];
-      if (track.muted) return;
-
-      const gainLevel = track.volume * velocity;
-      const tune = 0.75 + (track.tune / 100) * 0.5;
-
-      switch (track.id) {
-        case 'kick': {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(140 * tune, time);
-          osc.frequency.exponentialRampToValueAtTime(40 * tune, time + 0.08);
-          osc.frequency.exponentialRampToValueAtTime(30, time + 0.35);
-          gain.gain.setValueAtTime(0.001, time);
-          gain.gain.linearRampToValueAtTime(gainLevel * 1.1, time + 0.004);
-          gain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
-          osc.connect(gain);
-          gain.connect(audioCtx.mainBus);
-          osc.start(time);
-          osc.stop(time + 0.40);
-          break;
-        }
-        case 'snare': {
-          const osc = audioCtx.createOscillator();
-          const oscGain = audioCtx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(185 * tune, time);
-          osc.frequency.exponentialRampToValueAtTime(90 * tune, time + 0.1);
-          oscGain.gain.setValueAtTime(gainLevel * 0.6, time);
-          oscGain.gain.exponentialRampToValueAtTime(0.001, time + 0.13);
-          osc.connect(oscGain);
-          oscGain.connect(audioCtx.mainBus);
-          osc.start(time);
-          osc.stop(time + 0.14);
-
-          const noise = audioCtx.createBufferSource();
-          noise.buffer = noiseBuffer;
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'highpass';
-          filter.frequency.setValueAtTime(1100 * tune, time);
-          const noiseGain = audioCtx.createGain();
-          noiseGain.gain.setValueAtTime(gainLevel * 0.72, time);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.21);
-          noise.connect(filter);
-          filter.connect(noiseGain);
-          noiseGain.connect(audioCtx.mainBus);
-          noise.start(time);
-          noise.stop(time + 0.23);
-          break;
-        }
-        case 'clap': {
-          const noise = audioCtx.createBufferSource();
-          noise.buffer = noiseBuffer;
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'bandpass';
-          filter.frequency.setValueAtTime(1300 * tune, time);
-          filter.Q.setValueAtTime(1.8, time);
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(0.0001, time);
-          const burst = 0.011;
-          for (let i = 0; i < 3; i++) {
-            const t = time + i * burst;
-            gain.gain.setValueAtTime(gainLevel * 0.62, t);
-            gain.gain.exponentialRampToValueAtTime(0.02, t + burst * 0.9);
-          }
-          const tail = time + 3 * burst;
-          gain.gain.setValueAtTime(gainLevel * 0.68, tail);
-          gain.gain.exponentialRampToValueAtTime(0.001, tail + 0.23);
-          noise.connect(filter);
-          filter.connect(gain);
-          gain.connect(audioCtx.mainBus);
-          noise.start(time);
-          noise.stop(tail + 0.25);
-          break;
-        }
-        case 'ch':
-        case 'oh': {
-          const decay = track.id === 'ch' ? 0.045 : 0.28;
-          const noise = audioCtx.createBufferSource();
-          noise.buffer = noiseBuffer;
-          const bandpass = audioCtx.createBiquadFilter();
-          bandpass.type = 'bandpass';
-          bandpass.frequency.setValueAtTime(8500 * tune, time);
-          bandpass.Q.setValueAtTime(1.2, time);
-          const highpass = audioCtx.createBiquadFilter();
-          highpass.type = 'highpass';
-          highpass.frequency.setValueAtTime(6500 * tune, time);
-          const gain = audioCtx.createGain();
-          gain.gain.setValueAtTime(gainLevel * 0.62, time);
-          gain.gain.exponentialRampToValueAtTime(0.001, time + decay);
-          noise.connect(bandpass);
-          bandpass.connect(highpass);
-          highpass.connect(gain);
-          gain.connect(audioCtx.mainBus);
-          noise.start(time);
-          noise.stop(time + decay + 0.02);
-          break;
-        }
-      }
-    }
-
-    /*************************************************************************
-     * 4. タイムライン・シークバー＆ピアノロールキャンバス
-     *************************************************************************/
-    const canvasWrapper = document.getElementById('canvasScrollWrapper');
-    const canvasContainer = document.getElementById('canvasVirtualContainer');
-    const drawingCanvas = document.getElementById('drawingCanvas');
-    const drawCtx = drawingCanvas.getContext('2d');
-
-    const rulerCanvas = document.getElementById('rulerCanvas');
-    const rulerCtx = rulerCanvas.getContext('2d');
-
-    let isDrawing = false;
-    let currentStroke = null;
-    let slideStartPoint = null;
-
-    // ズーム更新
-    function applyZoom() {
-      const baseWidth = canvasWrapper.clientWidth;
-      const baseHeight = 380;
-
-      const newWidth = Math.round(baseWidth * state.zoomX);
-      const newHeight = Math.round(baseHeight * state.zoomY);
-
-      canvasContainer.style.width = `${newWidth}px`;
-      canvasContainer.style.height = `${newHeight}px`;
-
-      const dpr = window.devicePixelRatio || 1;
-      drawingCanvas.width = newWidth * dpr;
-      drawingCanvas.height = newHeight * dpr;
-
-      // タイムラインルーラー
-      const rulerRect = rulerCanvas.parentElement.getBoundingClientRect();
-      rulerCanvas.width = rulerRect.width * dpr;
-      rulerCanvas.height = rulerRect.height * dpr;
-
-      drawRuler();
-      drawPianoRoll();
-    }
-    window.addEventListener('resize', applyZoom);
-
-    // タイムラインルーラーの描画（小節線・拍表示・シークマーカー）
-    function drawRuler() {
-      const w = rulerCanvas.width;
-      const h = rulerCanvas.height;
-      const dpr = window.devicePixelRatio || 1;
-
-      rulerCtx.clearRect(0, 0, w, h);
-
-      // 背景
-      rulerCtx.fillStyle = 'transparent';
-      rulerCtx.fillRect(0, 0, w, h);
-
-      const totalBars = state.totalBars;
-      const barWidth = w / totalBars;
-
-      for (let b = 0; b < totalBars; b++) {
-        const x = b * barWidth;
-        // 小節線
-        rulerCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-        rulerCtx.lineWidth = 1.5 * dpr;
-        rulerCtx.beginPath();
-        rulerCtx.moveTo(x, 0);
-        rulerCtx.lineTo(x, h);
-        rulerCtx.stroke();
-
-        // 小節番号テキスト
-        rulerCtx.fillStyle = '#f59e0b';
-        rulerCtx.font = `bold ${10 * dpr}px JetBrains Mono`;
-        rulerCtx.fillText(`${b + 1}小節`, x + 5 * dpr, 14 * dpr);
-
-        // 4拍の区切り
-        for (let beat = 1; beat < 4; beat++) {
-          const beatX = x + (barWidth / 4) * beat;
-          rulerCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-          rulerCtx.lineWidth = 1 * dpr;
-          rulerCtx.beginPath();
-          rulerCtx.moveTo(beatX, h * 0.4);
-          rulerCtx.lineTo(beatX, h);
-          rulerCtx.stroke();
-        }
-      }
-    }
-
-    // ピアノロールキャンバス背景とストロークの描画
-    function drawPianoRoll() {
-      const w = drawingCanvas.width;
-      const h = drawingCanvas.height;
-      const dpr = window.devicePixelRatio || 1;
-      const totalNotes = MAX_MIDI - MIN_MIDI;
-
-      drawCtx.clearRect(0, 0, w, h);
-
-      // 1. 背景のオクターブ線＆C音ガイド
-      for (let m = MIN_MIDI; m <= MAX_MIDI; m++) {
-        const normY = (MAX_MIDI - m) / totalNotes;
-        const y = normY * h;
-        const noteIdx = ((m % 12) + 12) % 12;
-
-        if (noteIdx === 0) {
-          // C音 (オクターブ境界)
-          drawCtx.fillStyle = 'rgba(239, 68, 68, 0.08)';
-          drawCtx.fillRect(0, y - (h / totalNotes) * 0.5, w, h / totalNotes);
-
-          drawCtx.strokeStyle = '#ef4444';
-          drawCtx.lineWidth = 1.2 * dpr;
-          drawCtx.beginPath();
-          drawCtx.moveTo(0, y);
-          drawCtx.lineTo(w, y);
-          drawCtx.stroke();
-
-          const oct = Math.floor(m / 12) - 1;
-          drawCtx.fillStyle = '#f87171';
-          drawCtx.font = `bold ${9 * dpr}px JetBrains Mono`;
-          drawCtx.fillText(`C${oct}`, 8 * dpr, y - 3 * dpr);
-        } else if (noteIdx === 7) {
-          // G音 (5度)
-          drawCtx.strokeStyle = 'rgba(6, 182, 212, 0.25)';
-          drawCtx.lineWidth = 0.8 * dpr;
-          drawCtx.beginPath();
-          drawCtx.moveTo(0, y);
-          drawCtx.lineTo(w, y);
-          drawCtx.stroke();
-        }
-      }
-
-      // 2. 小節線＆拍線の縦軸描画
-      const totalBars = state.totalBars;
-      for (let b = 0; b <= totalBars; b++) {
-        const x = (b / totalBars) * w;
-        drawCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-        drawCtx.lineWidth = 1.5 * dpr;
-        drawCtx.beginPath();
-        drawCtx.moveTo(x, 0);
-        drawCtx.lineTo(x, h);
-        drawCtx.stroke();
-
-        // 各拍 (4拍/小節)
-        if (b < totalBars) {
-          for (let beat = 1; beat < 4; beat++) {
-            const bx = x + ((1 / totalBars) / 4) * beat * w;
-            drawCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-            drawCtx.lineWidth = 0.8 * dpr;
-            drawCtx.beginPath();
-            drawCtx.moveTo(bx, 0);
-            drawCtx.lineTo(bx, h);
-            drawCtx.stroke();
-          }
-        }
-      }
-
-      // 3. ストロークの描画
-      strokes.forEach(stroke => {
-        if (!stroke.points || stroke.points.length === 0) return;
-
-        drawCtx.strokeStyle = stroke.color;
-        drawCtx.lineWidth = 3.5 * dpr;
-        drawCtx.lineCap = 'round';
-        drawCtx.lineJoin = 'round';
-
-        drawCtx.beginPath();
-        const p0 = stroke.points[0];
-        drawCtx.moveTo(p0.t * w, p0.y * h);
-
-        for (let i = 1; i < stroke.points.length; i++) {
-          const p = stroke.points[i];
-          drawCtx.lineTo(p.t * w, p.y * h);
-        }
-        drawCtx.stroke();
-
-        // 終点サークル
-        const pLast = stroke.points[stroke.points.length - 1];
-        drawCtx.fillStyle = '#ffffff';
-        drawCtx.beginPath();
-        drawCtx.arc(pLast.t * w, pLast.y * h, 2.5 * dpr, 0, Math.PI * 2);
-        drawCtx.fill();
-      });
-
-      // 描画中のストローク
-      if (currentStroke && currentStroke.points && currentStroke.points.length > 0) {
-        drawCtx.strokeStyle = currentStroke.color;
-        drawCtx.lineWidth = 3.5 * dpr;
-        drawCtx.lineCap = 'round';
-        drawCtx.lineJoin = 'round';
-
-        drawCtx.beginPath();
-        const p0 = currentStroke.points[0];
-        drawCtx.moveTo(p0.t * w, p0.y * h);
-        for (let i = 1; i < currentStroke.points.length; i++) {
-          const p = currentStroke.points[i];
-          drawCtx.lineTo(p.t * w, p.y * h);
-        }
-        drawCtx.stroke();
-      }
-    }
-
-    // 画面座標から正規化座標 (t: 0..1, y: 0..1) ＆ スナップ
-    function canvasPosToNormalized(clientX, clientY) {
-      const rect = drawingCanvas.getBoundingClientRect();
-      let x = (clientX - rect.left) / rect.width;
-      let y = (clientY - rect.top) / rect.height;
-      x = Math.max(0, Math.min(1, x));
-      y = Math.max(0, Math.min(1, y));
-
-      // グリッドスナップ
-      if (state.gridSnap !== 'free') {
-        const totalSteps = state.totalBars * parseInt(state.gridSnap, 10);
-        x = Math.round(x * totalSteps) / totalSteps;
-      }
-
-      // 音階スナップ
-      let midi = MAX_MIDI - y * (MAX_MIDI - MIN_MIDI);
-      if (state.scaleSnap === 'semitone') {
-        midi = Math.round(midi);
-      } else if (state.scaleSnap === 'major') {
-        const major = [0, 2, 4, 5, 7, 9, 11];
-        const oct = Math.floor(midi / 12);
-        const pitchInOct = midi % 12;
-        let closest = major[0];
-        let minDist = 999;
-        for (let o of major) {
-          const d = Math.abs(pitchInOct - o);
-          if (d < minDist) { minDist = d; closest = o; }
-        }
-        midi = oct * 12 + closest;
-      } else if (state.scaleSnap === 'pentatonic') {
-        const penta = [0, 2, 4, 7, 9];
-        const oct = Math.floor(midi / 12);
-        const pitchInOct = midi % 12;
-        let closest = penta[0];
-        let minDist = 999;
-        for (let o of penta) {
-          const d = Math.abs(pitchInOct - o);
-          if (d < minDist) { minDist = d; closest = o; }
-        }
-        midi = oct * 12 + closest;
-      }
-
-      const freq = midiToFreq(midi);
-      const snappedY = (MAX_MIDI - midi) / (MAX_MIDI - MIN_MIDI);
-
-      return { t: x, y: snappedY, midi, freq };
-    }
-
-    // タイムラインルーラーでのシーク（途中から再生）
-    function handleRulerSeek(clientX) {
-      const rect = rulerCanvas.getBoundingClientRect();
-      let ratio = (clientX - rect.left) / rect.width;
-      ratio = Math.max(0, Math.min(1, ratio));
-
-      seekToRatio(ratio);
-    }
-
-    function seekToRatio(ratio) {
-      state.seekRatio = ratio;
-      state.playbackRatio = ratio;
-
-      // タイムラインマーカー更新
-      document.getElementById('rulerSeekMarker').style.left = `${ratio * 100}%`;
-      document.getElementById('canvasPlayhead').style.left = `${ratio * 100}%`;
-
-      // 現在小節・ステップ計算
-      const totalSteps = state.totalBars * STEPS_PER_BAR;
-      const curStepTotal = Math.floor(ratio * totalSteps);
-      const curBar = Math.floor(curStepTotal / STEPS_PER_BAR) + 1;
-      const curStepInBar = (curStepTotal % STEPS_PER_BAR) + 1;
-      document.getElementById('stepReadout').textContent = `${curBar}小節 / ${String(curStepInBar).padStart(2, '0')}`;
-
-      // 再生中であれば、再生開始基準時間を更新して瞬時にシーク位置から継続
-      if (state.isPlaying && audioCtx) {
-        const secondsPerBar = (60.0 / state.bpm) * 4.0;
-        const totalDuration = secondsPerBar * state.totalBars;
-        loopStartTime = audioCtx.currentTime - (ratio * totalDuration);
-      }
-    }
-
-    // キャンバスのマウスイベント（描画）
-    drawingCanvas.addEventListener('mousedown', (e) => {
-      initAudioEngine();
-      isDrawing = true;
-      const p = canvasPosToNormalized(e.clientX, e.clientY);
-
-      undoStack.push(JSON.parse(JSON.stringify(strokes)));
-      if (undoStack.length > 25) undoStack.shift();
-
-      if (state.activeTool === 'eraser') {
-        eraseAtPoint(p.t, p.y);
-      } else if (state.activeTool === 'slide') {
-        slideStartPoint = p;
-        currentStroke = {
-          id: 's_' + Date.now(),
-          type: 'slide',
-          instrumentKey: state.activeInstrument,
-          color: INSTRUMENTS[state.activeInstrument].color,
-          points: [p, p]
-        };
-        previewPitch(p.freq);
-      } else {
-        currentStroke = {
-          id: 's_' + Date.now(),
-          type: 'freehand',
-          instrumentKey: state.activeInstrument,
-          color: INSTRUMENTS[state.activeInstrument].color,
-          points: [p]
-        };
-        previewPitch(p.freq);
-      }
-      drawPianoRoll();
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      const rect = drawingCanvas.getBoundingClientRect();
-      const inCanvas = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-
-      if (inCanvas) {
-        const p = canvasPosToNormalized(e.clientX, e.clientY);
-        const curBar = Math.floor(p.t * state.totalBars) + 1;
-        document.getElementById('cursorNoteText').textContent = midiToNoteString(p.midi);
-        document.getElementById('cursorFreqText').textContent = `${Math.round(p.freq)} Hz`;
-        document.getElementById('cursorTimeText').textContent = `${curBar}小節目 (${Math.round(p.t * 100)}%)`;
-      }
-
-      if (!isDrawing) return;
-      const p = canvasPosToNormalized(e.clientX, e.clientY);
-
-      if (state.activeTool === 'eraser') {
-        eraseAtPoint(p.t, p.y);
-      } else if (state.activeTool === 'slide') {
-        if (currentStroke && slideStartPoint) {
-          currentStroke.points = [slideStartPoint, p];
-          drawPianoRoll();
-        }
-      } else if (state.activeTool === 'pen') {
-        if (currentStroke) {
-          const lastP = currentStroke.points[currentStroke.points.length - 1];
-          if (Math.hypot(p.t - lastP.t, p.y - lastP.y) > 0.003) {
-            currentStroke.points.push(p);
-            if (!state.isPlaying) {
-              updateStrokeVoice(currentStroke, p.freq, audioCtx.currentTime);
-            }
-            drawPianoRoll();
-          }
-        }
-      }
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (isDrawing) {
-        isDrawing = false;
-        if (!state.isPlaying && currentStroke) {
-          stopStrokeVoice(currentStroke.id, audioCtx.currentTime);
-        }
-        if (currentStroke && currentStroke.points.length > 0) {
-          strokes.push(currentStroke);
-          currentStroke = null;
-          slideStartPoint = null;
-          updateStrokeCount();
-          drawPianoRoll();
-        }
-      }
-    });
-
-    function eraseAtPoint(normT, normY) {
-      const threshold = 0.025 / state.zoomX;
-      const len = strokes.length;
-      strokes = strokes.filter(s => {
-        for (let pt of s.points) {
-          if (Math.hypot(pt.t - normT, pt.y - normY) < threshold) return false;
-        }
-        return true;
-      });
-      if (strokes.length !== len) {
-        updateStrokeCount();
-        drawPianoRoll();
-      }
-    }
-
-    function updateStrokeCount() {
-      document.getElementById('strokeCountText').textContent = strokes.length;
-    }
-
-    function undoLast() {
-      if (undoStack.length > 0) {
-        strokes = undoStack.pop();
-        updateStrokeCount();
-        drawPianoRoll();
-      }
-    }
-
-    /*************************************************************************
-     * 5. ループ再生 & シーク追従エンジン
-     *************************************************************************/
-    let loopStartTime = 0;
-
-    function startPlayback() {
-      initAudioEngine();
-      if (state.isPlaying) return;
-
-      state.isPlaying = true;
-
-      // シーク位置から再生を開始
-      const secondsPerBar = (60.0 / state.bpm) * 4.0;
-      const totalDuration = secondsPerBar * state.totalBars;
-      loopStartTime = audioCtx.currentTime - (state.seekRatio * totalDuration);
-
-      updateTransportUI();
-    }
-
-    function stopPlayback() {
-      state.isPlaying = false;
-      stopAllStrokeVoices();
-      clearPlayheadHighlights();
-      updateTransportUI();
-    }
-
-    function togglePlayback() {
-      if (state.isPlaying) stopPlayback();
-      else startPlayback();
-    }
-
-    function rewindToStart() {
-      seekToRatio(0.0);
-    }
-
-    // メインアニメーション＆オーディオスケジューラー
-    function audioRenderLoop() {
-      if (audioCtx && state.isPlaying) {
-        const curTime = audioCtx.currentTime;
-        const secondsPerBar = (60.0 / state.bpm) * 4.0;
-        const totalDuration = secondsPerBar * state.totalBars;
-        const elapsedTime = curTime - loopStartTime;
-
-        let frac = elapsedTime / totalDuration;
-
-        if (frac >= 1.0) {
-          if (state.isLoop) {
-            // ループ再生
-            loopStartTime = curTime;
-            frac = 0.0;
-          } else {
-            // ワンショット再生終了
-            stopPlayback();
-            frac = 1.0;
-          }
-        }
-
-        state.playbackRatio = frac;
-
-        // プレイヘッド位置の更新
-        document.getElementById('canvasPlayhead').style.left = `${frac * 100}%`;
-        document.getElementById('rulerSeekMarker').style.left = `${frac * 100}%`;
-
-        // 小節・ステップ表示の更新
-        const totalSteps = state.totalBars * STEPS_PER_BAR;
-        const curStepTotal = Math.floor(frac * totalSteps);
-        const curBar = Math.floor(curStepTotal / STEPS_PER_BAR) + 1;
-        const curStepInBar = (curStepTotal % STEPS_PER_BAR);
-
-        if (curStepInBar !== state.currentStep) {
-          triggerDrumStep(curStepInBar, curTime);
-          highlightDrumColumn(curStepInBar);
-          state.currentStep = curStepInBar;
-          document.getElementById('stepReadout').textContent = `${curBar}小節 / ${String(curStepInBar + 1).padStart(2, '0')}`;
-        }
-
-        // アナログ周波数追従（各ストロークの周波数を連続補間）
-        const activeIds = new Set();
-        strokes.forEach(s => {
-          if (!s.points || s.points.length === 0) return;
-          const tMin = Math.min(s.points[0].t, s.points[s.points.length - 1].t);
-          const tMax = Math.max(s.points[0].t, s.points[s.points.length - 1].t);
-
-          if (frac >= tMin && frac <= tMax) {
-            activeIds.add(s.id);
-            let targetFreq = null;
-            if (s.points.length === 1) {
-              targetFreq = s.points[0].freq;
-            } else {
-              for (let i = 0; i < s.points.length - 1; i++) {
-                const pA = s.points[i];
-                const pB = s.points[i + 1];
-                const segMin = Math.min(pA.t, pB.t);
-                const segMax = Math.max(pA.t, pB.t);
-                if (frac >= segMin && frac <= segMax) {
-                  const r = segMax === segMin ? 0 : (frac - pA.t) / (pB.t - pA.t);
-                  targetFreq = pA.freq + (pB.freq - pA.freq) * r;
-                  break;
-                }
-              }
-              if (!targetFreq) targetFreq = s.points[0].freq;
-            }
-            updateStrokeVoice(s, targetFreq, curTime);
-          }
-        });
-
-        activeVoices.forEach((v, id) => {
-          if (!activeIds.has(id)) stopStrokeVoice(id, curTime);
-        });
-      }
-
-      drawVisualizer();
-      requestAnimationFrame(audioRenderLoop);
-    }
-
-    function triggerDrumStep(step, time) {
-      for (let t = 0; t < DRUM_TRACKS.length; t++) {
-        const val = drumPattern[t][step];
-        if (val > 0) {
-          if (DRUM_TRACKS[t].id === 'oh' && drumPattern[3][step] > 0) continue;
-          triggerDrumVoice(t, time, val === 2 ? 1.35 : 0.95);
-        }
-      }
-    }
-
-    /*************************************************************************
-     * 6. ドラムUI ＆ ビジュアライザー
-     *************************************************************************/
-    function buildDrumUI() {
-      const ruler = document.getElementById('drumStepRuler');
-      ruler.innerHTML = '';
-      for (let s = 0; s < STEPS_PER_BAR; s++) {
-        const div = document.createElement('div');
-        div.id = `drum-ruler-${s}`;
-        div.className = `h-5 rounded flex items-center justify-center font-mono text-[10px] border themed-border transition ${
-          s % 4 === 0 ? 'themed-surface text-white font-bold' : 'themed-text-muted'
-        }`;
-        div.textContent = String(s + 1).padStart(2, '0');
-        ruler.appendChild(div);
-      }
-
-      const container = document.getElementById('drumTracksContainer');
-      container.innerHTML = '';
-
-      DRUM_TRACKS.forEach((track, tIdx) => {
-        const row = document.createElement('div');
-        row.className = 'flex items-center';
-
-        const header = document.createElement('div');
-        header.className = 'w-48 flex-shrink-0 pr-2 flex items-center justify-between themed-surface border themed-border rounded-l px-2 py-1 mr-1';
-        header.innerHTML = `
-          <div class="flex items-center space-x-1.5">
-            <button data-audition="${tIdx}" class="px-1.5 py-0.5 rounded border themed-border hover:bg-slate-500/20 text-left transition flex items-center space-x-1" title="試聴">
-              <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${track.color};"></span>
-              <span class="font-bold text-[11px]">${track.short}</span>
-            </button>
-          </div>
-          <div class="flex items-center space-x-1.5">
-            <input type="range" min="0" max="100" value="${Math.round(track.volume * 100)}" data-drum-vol="${tIdx}" class="flat-slider w-12" title="音量" />
-            <button data-drum-mute="${tIdx}" class="px-1 py-0.5 rounded text-[9px] font-bold border themed-border themed-text-muted hover:text-white transition" title="消音">消音</button>
-          </div>
-        `;
-
-        const stepsGrid = document.createElement('div');
-        stepsGrid.className = 'flex-1 grid grid-cols-16 gap-1';
-
-        for (let s = 0; s < STEPS_PER_BAR; s++) {
-          const btn = document.createElement('button');
-          btn.id = `drum-pad-${tIdx}-${s}`;
-          btn.className = `step-pad h-6 rounded border themed-border flex items-center justify-center ${
-            Math.floor(s / 4) % 2 === 1 ? 'themed-surface' : 'themed-panel'
-          } hover:border-slate-400`;
-
-          btn.addEventListener('click', (e) => {
-            initAudioEngine();
-            const cur = drumPattern[tIdx][s];
-            drumPattern[tIdx][s] = e.shiftKey ? (cur === 2 ? 0 : 2) : (cur > 0 ? 0 : 1);
-            if (drumPattern[tIdx][s] > 0 && !state.isPlaying) {
-              triggerDrumVoice(tIdx, audioCtx.currentTime, drumPattern[tIdx][s] === 2 ? 1.35 : 0.95);
-            }
-            renderDrumPad(tIdx, s);
-          });
-
-          btn.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            drumPattern[tIdx][s] = drumPattern[tIdx][s] === 2 ? 0 : 2;
-            renderDrumPad(tIdx, s);
-          });
-
-          stepsGrid.appendChild(btn);
-        }
-
-        row.appendChild(header);
-        row.appendChild(stepsGrid);
-        container.appendChild(row);
-      });
-
-      container.querySelectorAll('[data-audition]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          initAudioEngine();
-          triggerDrumVoice(parseInt(btn.dataset.audition, 10), audioCtx.currentTime, 1.0);
-        });
-      });
-      container.querySelectorAll('[data-drum-vol]').forEach(slider => {
-        slider.addEventListener('input', (e) => {
-          DRUM_TRACKS[parseInt(slider.dataset.drumVol, 10)].volume = parseInt(e.target.value, 10) / 100;
-        });
-      });
-      container.querySelectorAll('[data-drum-mute]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const tIdx = parseInt(btn.dataset.drumMute, 10);
-          DRUM_TRACKS[tIdx].muted = !DRUM_TRACKS[tIdx].muted;
-          btn.classList.toggle('bg-rose-500', DRUM_TRACKS[tIdx].muted);
-          btn.classList.toggle('text-white', DRUM_TRACKS[tIdx].muted);
-        });
-      });
-    }
-
-    function renderDrumPad(tIdx, s) {
-      const btn = document.getElementById(`drum-pad-${tIdx}-${s}`);
-      if (!btn) return;
-      const val = drumPattern[tIdx][s];
-      const track = DRUM_TRACKS[tIdx];
-
-      if (val === 1) {
-        btn.style.backgroundColor = track.color;
-        btn.style.borderColor = track.color;
-        btn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-white"></span>`;
-      } else if (val === 2) {
-        btn.style.backgroundColor = track.color;
-        btn.style.borderColor = '#ffffff';
-        btn.innerHTML = `<span class="w-2.5 h-2.5 rounded-sm bg-white"></span>`;
-      } else {
-        btn.style.backgroundColor = '';
-        btn.style.borderColor = '';
-        btn.innerHTML = '';
-      }
-    }
-
-    function clearPlayheadHighlights() {
-      document.querySelectorAll('.playhead-active').forEach(el => el.classList.remove('playhead-active'));
-      for (let s = 0; s < STEPS_PER_BAR; s++) {
-        const r = document.getElementById(`drum-ruler-${s}`);
-        if (r) {
-          r.className = `h-5 rounded flex items-center justify-center font-mono text-[10px] border themed-border transition ${
-            s % 4 === 0 ? 'themed-surface text-white font-bold' : 'themed-text-muted'
-          }`;
-        }
-      }
-    }
-
-    function highlightDrumColumn(step) {
-      clearPlayheadHighlights();
-      const r = document.getElementById(`drum-ruler-${step}`);
-      if (r) {
-        r.className = 'h-5 rounded flex items-center justify-center font-mono text-[10px] border bg-amber-500 text-white border-amber-400 font-bold';
-      }
-      for (let t = 0; t < DRUM_TRACKS.length; t++) {
-        const pad = document.getElementById(`drum-pad-${t}-${step}`);
-        if (pad) pad.classList.add('playhead-active');
-      }
-    }
-
-    // ビジュアライザー
-    const visCanvas = document.getElementById('visualizerCanvas');
-    const visCtx = visCanvas.getContext('2d');
-
-    function drawVisualizer() {
-      const w = visCanvas.width;
-      const h = visCanvas.height;
-      visCtx.clearRect(0, 0, w, h);
-      if (!analyser) return;
-
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      analyser.getByteFrequencyData(dataArray);
-
-      const barCount = 18;
-      const step = Math.floor(bufferLength / barCount);
-      const barWidth = (w / barCount) - 1;
-
-      for (let i = 0; i < barCount; i++) {
-        const val = dataArray[i * step] / 255.0;
-        const barHeight = Math.max(2, val * (h - 2));
-        const x = i * (barWidth + 1);
-        const y = h - barHeight;
-        visCtx.fillStyle = '#06b6d4';
-        visCtx.fillRect(x, y, barWidth, barHeight);
-      }
-    }
-
-    /*************************************************************************
-     * 7. プリセット ＆ UIイベントバインド
-     *************************************************************************/
-    const PRESETS = {
-      starry: {
-        bpm: 110,
-        bars: 2,
-        drums: [
-          [2,0,0,0, 0,0,1,0, 2,0,0,0, 0,0,1,0],
-          [0,0,0,0, 2,0,0,0, 0,0,0,0, 2,0,0,0],
-          [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
-          [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
-          [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1]
-        ],
-        strokes: [
-          // ピアノアルペジオ (1小節目)
-          { id: 'p1', type: 'slide', instrumentKey: 'piano', color: '#3b82f6', points: [
-            { t: 0.0, y: 0.57, freq: midiToFreq(60) }, // C4
-            { t: 0.2, y: 0.45, freq: midiToFreq(72) }  // C5
-          ]},
-          { id: 'p2', type: 'slide', instrumentKey: 'piano', color: '#3b82f6', points: [
-            { t: 0.22, y: 0.45, freq: midiToFreq(72) },
-            { t: 0.45, y: 0.38, freq: midiToFreq(79) }  // G5
-          ]},
-          // ギターの波形ビブラート (2小節目)
-          { id: 'g1', type: 'freehand', instrumentKey: 'guitar', color: '#f59e0b', points: [
-            { t: 0.50, y: 0.45, freq: midiToFreq(72) },
-            { t: 0.60, y: 0.42, freq: midiToFreq(76) },
-            { t: 0.70, y: 0.47, freq: midiToFreq(71) },
-            { t: 0.85, y: 0.45, freq: midiToFreq(72) }
-          ]},
-          // ベース重低音スライド
-          { id: 'b1', type: 'slide', instrumentKey: 'bass', color: '#ef4444', points: [
-            { t: 0.00, y: 0.85, freq: midiToFreq(36) },
-            { t: 0.48, y: 0.78, freq: midiToFreq(43) }
-          ]},
-          { id: 'b2', type: 'slide', instrumentKey: 'bass', color: '#ef4444', points: [
-            { t: 0.50, y: 0.78, freq: midiToFreq(43) },
-            { t: 0.98, y: 0.85, freq: midiToFreq(36) }
-          ]}
-        ]
-      },
-      piano_melody: {
-        bpm: 100,
-        bars: 4,
-        drums: [
-          [2,0,0,0, 0,0,0,0, 2,0,0,0, 0,0,0,0],
-          [0,0,0,0, 2,0,0,0, 0,0,0,0, 2,0,0,0],
-          [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0],
-          [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
-          [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1]
-        ],
-        strokes: [
-          // ピアノの優雅なメロディ
-          { id: 'pm1', type: 'slide', instrumentKey: 'piano', color: '#3b82f6', points: [
-            { t: 0.02, y: 0.55, freq: midiToFreq(62) },
-            { t: 0.22, y: 0.48, freq: midiToFreq(69) }
-          ]},
-          { id: 'pm2', type: 'slide', instrumentKey: 'piano', color: '#3b82f6', points: [
-            { t: 0.25, y: 0.44, freq: midiToFreq(74) },
-            { t: 0.45, y: 0.38, freq: midiToFreq(81) }
-          ]},
-          // 弦楽器アンサンブル
-          { id: 'st1', type: 'slide', instrumentKey: 'strings', color: '#8b5cf6', points: [
-            { t: 0.50, y: 0.52, freq: midiToFreq(65) },
-            { t: 0.95, y: 0.50, freq: midiToFreq(67) }
-          ]},
-          // マリンバ
-          { id: 'mar1', type: 'slide', instrumentKey: 'marimba', color: '#10b981', points: [
-            { t: 0.75, y: 0.35, freq: midiToFreq(84) },
-            { t: 0.95, y: 0.30, freq: midiToFreq(89) }
-          ]}
-        ]
-      },
-      slide_acid: {
-        bpm: 132,
-        bars: 2,
-        drums: [
-          [2,0,0,0, 2,0,0,0, 2,0,0,0, 2,0,0,0],
-          [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],
-          [0,0,0,0, 2,0,0,1, 0,0,0,0, 2,0,0,0],
-          [1,1,0,1, 1,1,0,1, 1,1,0,1, 1,1,0,1],
-          [0,0,2,0, 0,0,2,0, 0,0,2,0, 0,0,2,0]
-        ],
-        strokes: [
-          { id: 'a1', type: 'slide', instrumentKey: 'chiptune', color: '#f97316', points: [
-            { t: 0.00, y: 0.75, freq: midiToFreq(36) },
-            { t: 0.22, y: 0.58, freq: midiToFreq(51) }
-          ]},
-          { id: 'a2', type: 'slide', instrumentKey: 'cosmic', color: '#06b6d4', points: [
-            { t: 0.25, y: 0.58, freq: midiToFreq(51) },
-            { t: 0.48, y: 0.70, freq: midiToFreq(43) }
-          ]},
-          { id: 'a3', type: 'slide', instrumentKey: 'chiptune', color: '#f97316', points: [
-            { t: 0.50, y: 0.70, freq: midiToFreq(43) },
-            { t: 0.98, y: 0.50, freq: midiToFreq(60) }
-          ]}
-        ]
-      },
-      empty: {
-        bpm: 120,
-        bars: 2,
-        drums: [
-          [2,0,0,0, 0,0,0,0, 2,0,0,0, 0,0,0,0],
-          [0,0,0,0, 2,0,0,0, 0,0,0,0, 2,0,0,0],
-          [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
-          [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0],
-          [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]
-        ],
-        strokes: []
-      }
-    };
-
-    function loadPreset(key) {
-      const p = PRESETS[key];
-      if (!p) return;
-
-      state.bpm = p.bpm;
-      document.getElementById('bpmSlider').value = p.bpm;
-      document.getElementById('bpmVal').textContent = p.bpm;
-
-      state.totalBars = p.bars || 2;
-      document.getElementById('barCountSelect').value = String(state.totalBars);
-
-      drumPattern = p.drums.map(row => [...row]);
-      strokes = JSON.parse(JSON.stringify(p.strokes));
-      undoStack = [];
-
-      updateStrokeCount();
-      seekToRatio(0.0);
-      for (let t = 0; t < DRUM_TRACKS.length; t++) {
-        for (let s = 0; s < STEPS_PER_BAR; s++) {
-          renderDrumPad(t, s);
-        }
-      }
-      applyZoom();
-    }
-
-    function updateTransportUI() {
-      const playBtn = document.getElementById('playBtn');
-      const playText = document.getElementById('playText');
-      if (state.isPlaying) {
-        playText.textContent = '一時停止';
-        playBtn.classList.add('bg-emerald-900/50', 'border-emerald-500');
-      } else {
-        playText.textContent = '再生';
-        playBtn.classList.remove('bg-emerald-900/50', 'border-emerald-500');
-      }
-    }
-
-    function bindUIEvents() {
-      // 再生・停止・シーク・巻き戻し
-      document.getElementById('playBtn').addEventListener('click', togglePlayback);
-      document.getElementById('stopBtn').addEventListener('click', stopPlayback);
-      document.getElementById('rewindBtn').addEventListener('click', rewindToStart);
-
-      // ループ切替トグル
-      const loopBtn = document.getElementById('loopToggleBtn');
-      loopBtn.addEventListener('click', () => {
-        state.isLoop = !state.isLoop;
-        if (state.isLoop) {
-          loopBtn.textContent = '🔁 ループ中';
-          loopBtn.className = 'px-2 py-1 rounded text-[11px] font-bold border themed-border bg-cyan-500/20 text-cyan-400 transition';
-        } else {
-          loopBtn.textContent = '➡️ 1回再生';
-          loopBtn.className = 'px-2 py-1 rounded text-[11px] font-bold border themed-border bg-slate-500/20 themed-text-muted transition';
-        }
-      });
-
-      // タイムラインルーラーでの途中シーク
-      const timelineContainer = document.getElementById('timelineRulerContainer');
-      let isRulerDragging = false;
-
-      timelineContainer.addEventListener('mousedown', (e) => {
-        isRulerDragging = true;
-        handleRulerSeek(e.clientX);
-      });
-      window.addEventListener('mousemove', (e) => {
-        if (isRulerDragging) handleRulerSeek(e.clientX);
-      });
-      window.addEventListener('mouseup', () => {
-        isRulerDragging = false;
-      });
-
-      // 小節数セレクター
-      document.getElementById('barCountSelect').addEventListener('change', (e) => {
-        state.totalBars = parseInt(e.target.value, 10);
-        seekToRatio(0.0);
-        applyZoom();
-      });
-
-      // テーマセレクター
-      document.getElementById('themeSelect').addEventListener('change', (e) => {
-        const theme = e.target.value;
-        document.body.setAttribute('data-theme', theme);
-        state.theme = theme;
-        applyZoom();
-      });
-
-      // ズーム操作
-      const zoomXSlider = document.getElementById('zoomXSlider');
-      const zoomYSlider = document.getElementById('zoomYSlider');
-
-      zoomXSlider.addEventListener('input', (e) => {
-        state.zoomX = parseInt(e.target.value, 10) / 100;
-        applyZoom();
-      });
-      zoomYSlider.addEventListener('input', (e) => {
-        state.zoomY = parseInt(e.target.value, 10) / 100;
-        applyZoom();
-      });
-
-      document.getElementById('zoomXInBtn').addEventListener('click', () => {
-        zoomXSlider.value = Math.min(300, parseInt(zoomXSlider.value, 10) + 25);
-        state.zoomX = parseInt(zoomXSlider.value, 10) / 100;
-        applyZoom();
-      });
-      document.getElementById('zoomXOutBtn').addEventListener('click', () => {
-        zoomXSlider.value = Math.max(50, parseInt(zoomXSlider.value, 10) - 25);
-        state.zoomX = parseInt(zoomXSlider.value, 10) / 100;
-        applyZoom();
-      });
-      document.getElementById('zoomYInBtn').addEventListener('click', () => {
-        zoomYSlider.value = Math.min(250, parseInt(zoomYSlider.value, 10) + 25);
-        state.zoomY = parseInt(zoomYSlider.value, 10) / 100;
-        applyZoom();
-      });
-      document.getElementById('zoomYOutBtn').addEventListener('click', () => {
-        zoomYSlider.value = Math.max(60, parseInt(zoomYSlider.value, 10) - 25);
-        state.zoomY = parseInt(zoomYSlider.value, 10) / 100;
-        applyZoom();
-      });
-
-      document.getElementById('zoomFitBtn').addEventListener('click', () => {
-        zoomXSlider.value = 100;
-        zoomYSlider.value = 100;
-        state.zoomX = 1.0;
-        state.zoomY = 1.0;
-        applyZoom();
-      });
-
-      // マウスホイールでのスクロール＆ズーム
-      canvasWrapper.addEventListener('wheel', (e) => {
-        if (e.ctrlKey) {
-          // Ctrl+ホイール: ズーム
-          e.preventDefault();
-          const delta = e.deltaY > 0 ? -15 : 15;
-          zoomXSlider.value = Math.max(50, Math.min(300, parseInt(zoomXSlider.value, 10) + delta));
-          state.zoomX = parseInt(zoomXSlider.value, 10) / 100;
-          applyZoom();
-        } else if (e.shiftKey) {
-          // Shift+ホイール: 横スクロール
-          e.preventDefault();
-          canvasWrapper.scrollLeft += e.deltaY;
-        }
-      }, { passive: false });
-
-      // 楽器パレット選択
-      document.querySelectorAll('.inst-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.inst-btn').forEach(b => {
-            b.classList.remove('border-2', 'border-white');
-            b.classList.add('border-transparent');
-          });
-          btn.classList.add('border-2', 'border-white');
-          btn.classList.remove('border-transparent');
-          state.activeInstrument = btn.dataset.inst;
-        });
-      });
-
-      // 描画ツール切替
-      const toolPen = document.getElementById('toolPen');
-      const toolSlide = document.getElementById('toolSlide');
-      const toolEraser = document.getElementById('toolEraser');
-
-      function setActiveTool(tool) {
-        state.activeTool = tool;
-        toolPen.classList.toggle('border-cyan-500', tool === 'pen');
-        toolSlide.classList.toggle('border-cyan-500', tool === 'slide');
-        toolEraser.classList.toggle('border-cyan-500', tool === 'eraser');
-      }
-
-      toolPen.addEventListener('click', () => setActiveTool('pen'));
-      toolSlide.addEventListener('click', () => setActiveTool('slide'));
-      toolEraser.addEventListener('click', () => setActiveTool('eraser'));
-      document.getElementById('undoBtn').addEventListener('click', undoLast);
-
-      // ショートカットキー
-      window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
-          e.preventDefault();
-          togglePlayback();
-        }
-        if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') {
-          e.preventDefault();
-          undoLast();
-        }
-      });
-
-      // スナップ設定
-      document.getElementById('gridSnapSelect').addEventListener('change', (e) => {
-        state.gridSnap = e.target.value;
-      });
-      document.getElementById('scaleSnapSelect').addEventListener('change', (e) => {
-        state.scaleSnap = e.target.value;
-      });
-
-      // スライダー
-      document.getElementById('bpmSlider').addEventListener('input', (e) => {
-        state.bpm = parseInt(e.target.value, 10);
-        document.getElementById('bpmVal').textContent = state.bpm;
-        if (delayNode && audioCtx) {
-          delayNode.delayTime.setTargetAtTime((60 / state.bpm) * 0.75, audioCtx.currentTime, 0.05);
-        }
-      });
-      document.getElementById('masterVolSlider').addEventListener('input', (e) => {
-        state.masterVolume = parseInt(e.target.value, 10) / 100;
-        document.getElementById('masterVolVal').textContent = `${parseInt(e.target.value, 10)}%`;
-        if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(state.masterVolume, audioCtx.currentTime, 0.02);
-      });
-      document.getElementById('synthCanvasVol').addEventListener('input', (e) => {
-        state.canvasVolume = parseInt(e.target.value, 10) / 100;
-        if (canvasGain && audioCtx) canvasGain.gain.setTargetAtTime(state.canvasVolume, audioCtx.currentTime, 0.02);
-      });
-
-      // プリセット & クリア
-      document.getElementById('presetSelect').addEventListener('change', (e) => {
-        loadPreset(e.target.value);
-      });
-      document.getElementById('clearBtn').addEventListener('click', () => {
-        undoStack.push(JSON.parse(JSON.stringify(strokes)));
-        strokes = [];
-        updateStrokeCount();
-        drawPianoRoll();
-      });
-    }
-
-    // 初期化実行
-    window.onload = function () {
-      buildDrumUI();
-      bindUIEvents();
-      loadPreset('starry');
-      applyZoom();
-      requestAnimationFrame(audioRenderLoop);
-    };
-  </script>
+  <!-- アプリケーション JavaScript (ES Modules) -->
+  <script type="module" src="js/app.js"></script>
 </body>
+
 </html>

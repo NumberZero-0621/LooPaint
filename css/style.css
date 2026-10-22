@@ -1,0 +1,204 @@
+/* =========================================================================
+ * カラーテーマ定義（CSSカスタムプロパティ）
+ * ========================================================================= */
+:root,
+[data-theme="dark"] {
+  --bg-main: #10131b;
+  --bg-panel: #171c26;
+  --bg-surface: #202634;
+  --border-color: #2b3447;
+  --text-main: #f1f5f9;
+  --text-muted: #8b98af;
+  --canvas-bg: #0c0f16;
+  --ruler-bg: #141822;
+  --playhead-color: #ffffff;
+}
+
+[data-theme="light"] {
+  --bg-main: #f3f6fa;
+  --bg-panel: #ffffff;
+  --bg-surface: #e5ebf3;
+  --border-color: #cbd5e1;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --canvas-bg: #f8fafc;
+  --ruler-bg: #edf2f8;
+  --playhead-color: #0284c7;
+}
+
+[data-theme="beepbox"] {
+  --bg-main: #000411;
+  --bg-panel: #0a1128;
+  --bg-surface: #1c2541;
+  --border-color: #2d3e64;
+  --text-main: #e8f1f5;
+  --text-muted: #7f95b5;
+  --canvas-bg: #04091a;
+  --ruler-bg: #0e1732;
+  --playhead-color: #00f0ff;
+}
+
+[data-theme="songmaker"] {
+  --bg-main: #f8faff;
+  --bg-panel: #ffffff;
+  --bg-surface: #eef2ff;
+  --border-color: #dbeafe;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --canvas-bg: #ffffff;
+  --ruler-bg: #f1f5f9;
+  --playhead-color: #ef4444;
+}
+
+[data-theme="cyberpunk"] {
+  --bg-main: #0c0517;
+  --bg-panel: #160a2b;
+  --bg-surface: #27104b;
+  --border-color: #491b8a;
+  --text-main: #f8f5ff;
+  --text-muted: #b091db;
+  --canvas-bg: #110521;
+  --ruler-bg: #1f0d3c;
+  --playhead-color: #00f0ff;
+}
+
+[data-theme="sepia"] {
+  --bg-main: #25201c;
+  --bg-panel: #332c27;
+  --bg-surface: #453c35;
+  --border-color: #5c5047;
+  --text-main: #f5f0ea;
+  --text-muted: #ad9e92;
+  --canvas-bg: #1c1815;
+  --ruler-bg: #2d2621;
+  --playhead-color: #f59e0b;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.themed-panel {
+  background-color: var(--bg-panel);
+  border-color: var(--border-color);
+}
+
+.themed-surface {
+  background-color: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+.themed-border {
+  border-color: var(--border-color);
+}
+
+.themed-text-muted {
+  color: var(--text-muted);
+}
+
+/* フラットなスライダー */
+input[type="range"].flat-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-surface);
+  height: 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+  outline: none;
+}
+
+input[type="range"].flat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #06b6d4;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  transition: transform 0.08s ease;
+}
+
+input[type="range"].flat-slider.orange-thumb::-webkit-slider-thumb {
+  background: #f97316;
+}
+
+input[type="range"].flat-slider.amber-thumb::-webkit-slider-thumb {
+  background: #f59e0b;
+}
+
+input[type="range"].flat-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+/* セレクトボックス */
+select {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px;
+  padding: 3px 6px;
+  outline: none;
+  font-size: 11px;
+}
+
+select:focus {
+  border-color: #06b6d4 !important;
+}
+
+select option {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-main) !important;
+}
+
+/* ステップパッド */
+.step-pad {
+  transition: background-color 0.05s ease, border-color 0.05s ease;
+  position: relative;
+}
+
+.step-pad:active {
+  transform: scale(0.95);
+}
+
+/* プレイヘッドのハイライト */
+.playhead-active {
+  outline: 2px solid var(--playhead-color) !important;
+  outline-offset: -1px;
+  z-index: 10;
+}
+
+/* 16列グリッド */
+.grid-cols-16 {
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+}
+
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* タイムライン・シークバー用ホバー */
+.timeline-ruler:hover {
+  cursor: pointer;
+  filter: brightness(1.15);
+}
